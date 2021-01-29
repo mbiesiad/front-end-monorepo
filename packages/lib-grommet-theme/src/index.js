@@ -247,6 +247,23 @@ const theme = deepFreeze({
     }
   },
   button: {
+    size: {
+      small: {
+        border: {
+          radius: '0px',
+        }
+      },
+      medium: {
+        border: {
+          radius: '0px',
+        }
+      },
+      large: {
+        border: {
+          radius: '0px',
+        }
+      },
+    },
     border: {
       color: 'brand',
       radius: '0px'
