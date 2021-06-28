@@ -1,7 +1,7 @@
 import { Box, DropButton } from 'grommet'
 import PropTypes from 'prop-types'
 import React, { useRef } from 'react'
-import styled, { css } from 'styled-components'
+import styled, { css, withTheme } from 'styled-components'
 import { SpacedText } from '@zooniverse/react-components'
 
 import Characteristics from '../Characteristics'
@@ -18,20 +18,19 @@ const StyledDropButton = styled(DropButton)`
   border-radius: 16px;
   padding: 3px 8px;
 
-  ${props => props.backgroundColor
-    ? css`background-color: ${props.theme.global.colors['accent-1']};`
-    : css`background-color: none;`}
+  ${props => css`background-color: ${props.backgroundColor};`}
+
+  &:hover, &:focus {
+    text-decoration: underline;
+  }
 `
 
-const StyledLabel = styled(SpacedText)`
-  text-transform: uppercase;
-`
-
-export default function FilterStatus (props) {
+export function FilterStatus (props) {
   const {
     filters,
     handleFilter,
-    task
+    task,
+    theme
   } = props
   const {
     characteristics,
@@ -43,6 +42,15 @@ export default function FilterStatus (props) {
 
   const selectedCharacteristicIds = Object.keys(filters)
 
+  let backgroundColor = 'none'
+
+  if (selectedCharacteristicIds.length > 0) {
+    if (theme.dark) {
+      backgroundColor = props.theme.global.colors.brand
+    } else {
+      backgroundColor = props.theme.global.colors['accent-1']
+    }
+  }
   return (
     <Box
       ref={filterStatusRef}
@@ -59,7 +67,7 @@ export default function FilterStatus (props) {
       height='xxsmall'
     >
       <StyledDropButton
-        backgroundColor={selectedCharacteristicIds.length > 0}
+        backgroundColor={backgroundColor}
         dropAlign={{
           left: 'left',
           top: 'bottom'
@@ -79,17 +87,19 @@ export default function FilterStatus (props) {
         }}
         dropTarget={filterStatusRef.current}
         gap='none'
-        icon={<FilterIcon />}
+        icon={<FilterIcon color='dark-5' />}
         label={
-          <StyledLabel
+          <SpacedText
             color={{
-              dark: 'brand',
+              dark: 'accent-1',
               light: 'neutral-1'
             }}
+            uppercase
           >
             {counterpart('CharacteristicsFilter.filter')}
-          </StyledLabel>
+          </SpacedText>
         }
+        plain
       />
       {selectedCharacteristicIds.map(characteristicId => {
         const characteristic = characteristics?.[characteristicId] || {}
@@ -115,7 +125,13 @@ export default function FilterStatus (props) {
 
 FilterStatus.defaultProps = {
   filters: {},
-  handleFilter: () => {}
+  handleFilter: () => {},
+  theme: {
+    dark: false,
+    global: {
+      colors: {}
+    }
+  }
 }
 
 FilterStatus.propTypes = {
@@ -128,3 +144,5 @@ FilterStatus.propTypes = {
     type: PropTypes.string
   }).isRequired
 }
+
+export default withTheme(FilterStatus)

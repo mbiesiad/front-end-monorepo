@@ -31,7 +31,7 @@ export default function ClearFilters (props) {
       </SpacedText>
       <PlainButton
         disabled={showingChoices === totalChoices}
-        icon={<Clear />}
+        icon={<Clear color='dark-5' size='15px' />}
         onClick={() => handleFilter()}
         text={counterpart('CharacteristicsFilter.clearFilters')}
       />

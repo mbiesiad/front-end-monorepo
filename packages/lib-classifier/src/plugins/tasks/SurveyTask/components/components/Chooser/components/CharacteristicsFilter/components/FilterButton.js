@@ -1,8 +1,8 @@
 import { Box } from 'grommet'
 import PropTypes from 'prop-types'
 import React from 'react'
-import styled from 'styled-components'
-import { CloseButton, Media } from '@zooniverse/react-components'
+import styled, { withTheme } from 'styled-components'
+import { CloseButton } from '@zooniverse/react-components'
 
 export const StyledFilter = styled(Box)`
   button {
@@ -16,17 +16,25 @@ export const StyledFilter = styled(Box)`
   }
 `
 
-export default function FilterButton (props) {
+export function FilterButton (props) {
   const {
     characteristicId,
     checked,
     onFilter,
     buttonSize,
+    theme,
     valueImageSrc,
     valueLabel
   } = props
 
-  const backgroundColor = checked ? 'accent-1' : 'neutral-6'
+  let backgroundColor = (theme.dark) ? 'light-6' : 'neutral-6'
+  if (checked) {
+    if (theme.dark) {
+      backgroundColor = 'brand'
+    } else {
+      backgroundColor = 'accent-1'
+    }
+  }
   const marginPerSize = buttonSize === 'small' ? 'none' : { bottom: 'xsmall' }
   const containerSize = buttonSize === 'small' ? '30px' : '40px'
   const mediaSize = buttonSize === 'small' ? '18' : '25'
@@ -41,7 +49,7 @@ export default function FilterButton (props) {
       round='full'
       width={containerSize}
     >
-      <Media
+      <img
         alt={valueLabel}
         height={mediaSize}
         src={valueImageSrc}
@@ -66,6 +74,12 @@ FilterButton.defaultProps = {
   checked: false,
   onFilter: () => {},
   buttonSize: 'medium',
+  theme: {
+    dark: false,
+    global: {
+      colors: {}
+    }
+  },
   valueImageSrc: '',
   valueLabel: ''
 }
@@ -78,3 +92,5 @@ FilterButton.propTypes = {
   valueImageSrc: PropTypes.string,
   valueLabel: PropTypes.string
 }
+
+export default withTheme(FilterButton)
