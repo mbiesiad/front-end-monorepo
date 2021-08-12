@@ -25,7 +25,13 @@ function Rectangle({ active, mark, onFinish, scale }) {
 
   return (
     <g onPointerUp={active ? _onFinish : undefined}>
-      <rect x={x_left} y={y_top} width={width} height={height} />
+      <rect
+        data-testid='rectangle-element'
+        x={x_left}
+        y={y_top}
+        width={width}
+        height={height}
+      />
       <rect
         x={x_left}
         y={y_top}
@@ -34,6 +40,8 @@ function Rectangle({ active, mark, onFinish, scale }) {
         strokeWidth={GRAB_STROKE_WIDTH / scale}
         strokeOpacity='0'
       />
+
+      {/* Top Left corner */}
       {active && (
         <DragHandle
           scale={scale}
@@ -49,36 +57,8 @@ function Rectangle({ active, mark, onFinish, scale }) {
           }
         />
       )}
-      {active && (
-        <DragHandle
-          scale={scale}
-          x={x_right}
-          y={y_bottom}
-          dragMove={(e, d) =>
-            onHandleDrag({
-              x_left: x_left,
-              x_right: x_right + d.x,
-              y_top: y_top,
-              y_bottom: y_bottom + d.y
-            })
-          }
-        />
-      )}
-      {active && (
-        <DragHandle
-          scale={scale}
-          x={x_left}
-          y={y_bottom}
-          dragMove={(e, d) =>
-            onHandleDrag({
-              x_left: x_left + d.x,
-              x_right: x_right,
-              y_top: y_top,
-              y_bottom: y_bottom + d.y
-            })
-          }
-        />
-      )}
+
+      {/* Top Right corner */}
       {active && (
         <DragHandle
           scale={scale}
@@ -90,6 +70,40 @@ function Rectangle({ active, mark, onFinish, scale }) {
               x_right: x_right + d.x,
               y_top: y_top + d.y,
               y_bottom: y_bottom
+            })
+          }
+        />
+      )}
+
+      {/* Bottom Right corner */}
+      {active && (
+        <DragHandle
+          scale={scale}
+          x={x_right}
+          y={y_bottom}
+          dragMove={(e, d) =>
+            onHandleDrag({
+              x_left: x_left,
+              x_right: x_right + d.x,
+              y_top: y_top,
+              y_bottom: y_bottom + d.y
+            })
+          }
+        />
+      )}
+
+      {/* Bottom Left corner */}
+      {active && (
+        <DragHandle
+          scale={scale}
+          x={x_left}
+          y={y_bottom}
+          dragMove={(e, d) =>
+            onHandleDrag({
+              x_left: x_left + d.x,
+              x_right: x_right,
+              y_top: y_top,
+              y_bottom: y_bottom + d.y
             })
           }
         />
