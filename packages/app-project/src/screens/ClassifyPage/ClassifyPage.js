@@ -13,6 +13,7 @@ import YourStats from './components/YourStats'
 import StandardLayout from '@shared/components/StandardLayout'
 import WorkflowAssignmentModal from './components/WorkflowAssignmentModal'
 import WorkflowMenuModal from './components/WorkflowMenuModal'
+import asyncStates from '@zooniverse/async-states'
 
 export const ClassifierWrapper = dynamic(() =>
   import('./components/ClassifierWrapper'), { ssr: false }
@@ -20,7 +21,9 @@ export const ClassifierWrapper = dynamic(() =>
 
 function ClassifyPage ({
   addToCollection,
+  appLoadingState,
   onSubjectReset,
+  projectPreferences = {},
   screenSize,
   subjectID,
   subjectSetID,
@@ -31,13 +34,30 @@ function ClassifyPage ({
     ? ['auto']
     : ['1em', 'auto', '1em']
 
-  const [ workflowFromUrl ] = workflows.filter(workflow => workflow.id === workflowID)
+  const assignedWorkflowID = projectPreferences.settings?.workflow_id || ''
+  let workflowFromUrl = workflows.find(workflow => workflow.id === workflowID)
+
+  let assignedWorkflow
+  if (assignedWorkflowID) {
+    assignedWorkflow = workflows.find(workflow => workflow.id === assignedWorkflowID)
+  }
+
   let subjectSetFromUrl
   if (workflowFromUrl && workflowFromUrl.subjectSets) {
-    [ subjectSetFromUrl ] = workflowFromUrl.subjectSets.filter(subjectSet => subjectSet.id === subjectSetID)
+    subjectSetFromUrl = workflowFromUrl.subjectSets.find(subjectSet => subjectSet.id === subjectSetID)
   }
+
+  let canLoadWorkflowFromUrl = true
+  if (assignedWorkflow) {
+    canLoadWorkflowFromUrl = assignedWorkflow.configuration.level >= workflowFromUrl.configuration.level
+
+    if (!canLoadWorkflowFromUrl) {
+      workflowFromUrl = null
+    }
+  }
+
   // The classifier requires a workflow by default
-  let canClassify = !!workflowID
+  let canClassify = !!workflowID && canLoadWorkflowFromUrl
   // grouped workflows require a subject set
   canClassify = workflowFromUrl?.grouped ? !!subjectSetID : canClassify
   // indexed subject sets require a subject
@@ -62,7 +82,7 @@ function ClassifyPage ({
       >
 
         <Box as='main' fill='horizontal'>
-          {!canClassify && (
+          {!canClassify && appLoadingState === asyncStates.success && (
             <WorkflowMenuModal
               subjectSetFromUrl={subjectSetFromUrl}
               workflowFromUrl={workflowFromUrl}
@@ -78,7 +98,8 @@ function ClassifyPage ({
             />
             <ThemeModeToggle />
           </Grid>
-          <WorkflowAssignmentModal currentWorkflowID={workflowID} />
+          {canLoadWorkflowFromUrl && 
+            <WorkflowAssignmentModal currentWorkflowID={workflowID} />}
         </Box>
 
         <Box as='aside' gap='medium' width={{ min: 'none', max: 'xxlarge' }}>
